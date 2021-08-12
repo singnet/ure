@@ -188,7 +188,7 @@ bool AndBIT::has_cycle(const Handle& h, HandleSet ancestors) const
 		Handle arg = h->getOutgoingAtom(1);
 		if (arg->get_type() == LIST_LINK) {
 			Handle conclusion = arg->getOutgoingAtom(0);
-			if (is_in(conclusion, ancestors))
+			if (contains(ancestors, conclusion))
 				return true;
 
 			ancestors.insert(conclusion);
@@ -216,10 +216,10 @@ bool AndBIT::has_cycle(const Handle& h, HandleSet ancestors) const
 			}
 			return false;
 		} else {
-			return is_in(arg, ancestors);
+			return contains(ancestors, arg);
 		}
 	} else {
-		return is_in(h, ancestors);
+		return contains(ancestors, h);
 	}
 }
 
@@ -769,7 +769,7 @@ AndBIT* BIT::expand(AndBIT& andbit, BITNode& bitleaf,
                     const RuleTypedSubstitutionPair& rule, double prob)
 {
 	// Make sure that the rule is not already an or-child of bitleaf.
-	if (is_in(rule, bitleaf)) {
+	if (contains(bitleaf, rule)) {
 		ure_logger().debug() << "An equivalent rule has already expanded "
 		                     << "that BIT-node, abort expansion";
 		return nullptr;
@@ -811,8 +811,8 @@ bool BIT::andbits_exhausted() const
 			return andbit.exhausted; });
 }
 
-bool BIT::is_in(const RuleTypedSubstitutionPair& rule,
-                const BITNode& bitnode) const
+bool BIT::contains(const BITNode& bitnode,
+                   const RuleTypedSubstitutionPair& rule) const
 {
 	return bitnode.rules.find(rule.first) != bitnode.rules.end();
 }
